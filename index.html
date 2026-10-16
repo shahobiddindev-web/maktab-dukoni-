@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maktab Do'koni — Mahsulotlar katalogi va Narxlar ro'yxati</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Maxsus uslublar -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+  <!-- Yuqori e'lon paneli -->
+  <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white text-xs py-2 px-4 no-print">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="bg-amber-400 text-slate-900 font-extrabold text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">Aksiya</span>
+        <span>2026-o'quv yili uchun barcha maktab qurollari hamyonbop ulgurji narxlarda!</span>
+      </div>
+      <div class="flex items-center gap-4 text-blue-100 text-[11px]">
+        <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i> Ish vaqti: 08:00 - 18:00</span>
+        <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Maktab 1-qavati, 102-xona</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Asosiy Header -->
+  <header class="sticky top-0 z-30 glass-header border-b border-slate-200/80 shadow-xs no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+      
+      <!-- Brend / Logo -->
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform">
+          <i data-lucide="backpack" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-xl font-extrabold text-slate-900 tracking-tight">Zukko</span>
+            <span class="text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md">Do'kon</span>
+          </div>
+          <p class="text-xs text-slate-500 font-medium">Maktab o'quv qurollari va kantselyariya</p>
+        </div>
+      </a>
+
+      <!-- Qidiruv paneli (Desktop) -->
+      <div class="hidden md:flex flex-1 max-w-md mx-4">
+        <div class="relative w-full">
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Mahsulot nomi, artikul yoki turini qidiring (masalan: daftar, ruchka)..." 
+            class="w-full pl-10 pr-4 py-2 text-sm bg-slate-100 hover:bg-slate-50 focus:bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600/30 focus:border-blue-600 transition"
+          />
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+        </div>
+      </div>
+
+      <!-- Amallar tugmalari -->
+      <div class="flex items-center gap-2.5">
+        
+        <!-- Narxnoma / Price List Modal Tugmasi -->
+        <button 
+          onclick="openPriceListModal()"
+          class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 shadow-xs transition"
+          title="To'liq narxlar ro'yxatini ko'rish va chop etish"
+        >
+          <i data-lucide="printer" class="w-4 h-4 text-slate-600"></i>
+          <span class="hidden sm:inline">Narxnoma (Chop etish)</span>
+        </button>
+
+        <!-- Yangi mahsulot qo'shish -->
+        <button 
+          onclick="openAddProductModal()"
+          class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition"
+          title="Katalogga yangi mahsulot kiritish"
+        >
+          <i data-lucide="plus-circle" class="w-4 h-4 text-blue-600"></i>
+          <span class="hidden sm:inline">Qo'shish</span>
+        </button>
+
+        <!-- Savatcha Tugmasi -->
+        <button 
+          onclick="toggleCartDrawer(true)"
+          class="relative flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md shadow-blue-500/20 active:scale-95 transition"
+        >
+          <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Savatcha</span>
+          <span id="cartBadge" class="hidden px-2 py-0.5 rounded-full bg-white text-blue-700 font-extrabold text-[11px] shadow-xs">0</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Mobil qidiruv paneli -->
+    <div class="md:hidden px-4 pb-3">
+      <div class="relative w-full">
+        <input 
+          type="text" 
+          placeholder="Mahsulot nomi yoki artikul..." 
+          oninput="searchQuery = this.value; renderProducts();"
+          class="w-full pl-9 pr-3 py-2 text-xs bg-slate-100 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600/30"
+        />
+        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- Asosiy Kontent -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 no-print">
+
+    <!-- Banner -->
+    <div class="relative rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-700 to-sky-700 text-white p-6 sm:p-8 mb-8 overflow-hidden shadow-lg shadow-blue-900/10">
+      <div class="relative z-10 max-w-2xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-blue-100 text-xs font-semibold mb-3">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
+          Yangi o'quv mavsumi katalogi
+        </div>
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight">
+          Maktab do'koni mahsulotlari katalogi va qulay narxlar
+        </h1>
+        <p class="text-blue-100 text-sm sm:text-base mt-2 leading-relaxed">
+          1-sinfdan 11-sinfgacha bo'lgan barcha o'quv qurollari, daftarlar, ruchkalar, rasm to'plamlari va xavfsiz idishlar. Bir bosishda tanlang va buyurtma bering!
+        </p>
+
+        <!-- Tezkor afzalliklar -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-white/15 text-xs font-medium">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center"><i data-lucide="check" class="w-4 h-4 text-emerald-300"></i></div>
+            <span>100% Sifat kafolati</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center"><i data-lucide="tag" class="w-4 h-4 text-amber-300"></i></div>
+            <span>Hamyonbop narxlar</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center"><i data-lucide="truck" class="w-4 h-4 text-sky-300"></i></div>
+            <span>Sinfga yetkazish</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center"><i data-lucide="file-text" class="w-4 h-4 text-purple-300"></i></div>
+            <span>Tayyor narxnoma</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orqa fon bezaklari -->
+      <div class="absolute -right-12 -bottom-12 w-80 h-80 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="absolute right-12 top-1/2 -translate-y-1/2 hidden lg:flex items-center justify-center opacity-85">
+        <div class="p-6 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 shadow-2xl flex flex-col items-center text-center">
+          <div class="text-3xl font-black text-amber-300">300+</div>
+          <div class="text-xs uppercase tracking-wider text-blue-100 font-semibold mt-1">Xil mahsulotlar</div>
+          <div class="mt-3 text-xs bg-white text-blue-900 font-bold px-3 py-1.5 rounded-xl shadow-xs">
+            Arzon va qulay
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kategoriyalar slayderi / tugmalari -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+          <i data-lucide="layout-grid" class="w-4 h-4 text-blue-600"></i>
+          Kategoriyalar bo'yicha saralash
+        </h2>
+        <button 
+          onclick="resetToDefaults()" 
+          class="text-xs font-semibold text-slate-400 hover:text-slate-600 transition"
+          title="Barcha ma'lumotlarni boshlang'ich holatga qaytarish"
+        >
+          Katalogni qayta tiklash
+        </button>
+      </div>
+
+      <div id="categoriesContainer" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <!-- JS orqali to'ldiriladi -->
+      </div>
+    </div>
+
+    <!-- Filtrlash va Boshqaruv paneli -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs mb-6 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+      
+      <!-- Chap tomon: Narx slayderi va qoldiq filtri -->
+      <div class="flex flex-wrap items-center gap-5">
+        
+        <!-- Narx filtri -->
+        <div class="flex items-center gap-3">
+          <label for="priceRange" class="text-xs font-bold text-slate-600 whitespace-nowrap">Maksimal narx:</label>
+          <input 
+            type="range" 
+            id="priceRange" 
+            min="1000" 
+            max="350000" 
+            step="1000" 
+            value="350000" 
+            class="w-32 accent-blue-600 cursor-pointer"
+          />
+          <span id="priceRangeValue" class="text-xs font-extrabold text-blue-700 bg-blue-50 px-2 py-1 rounded-md min-w-[90px] text-center">
+            350 000 so'm
+          </span>
+        </div>
+
+        <!-- Faqat omborda borlari -->
+        <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-medium text-slate-700 hover:text-blue-600 transition">
+          <input type="checkbox" id="stockOnlyCheckbox" class="rounded text-blue-600 focus:ring-blue-500 w-4 h-4">
+          <span>Faqat sotuvda borlari</span>
+        </label>
+
+      </div>
+
+      <!-- O'ng tomon: Saralash va Ko'rinish turi (Grid vs Table) -->
+      <div class="flex items-center justify-between lg:justify-end gap-3 border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-100">
+        
+        <!-- Natijalar soni -->
+        <span id="productsCountDisplay" class="text-xs font-bold text-slate-500">
+          Yuklanmoqda...
+        </span>
+
+        <!-- Saralash dropdown -->
+        <div class="flex items-center gap-2">
+          <label for="sortSelect" class="text-xs font-medium text-slate-500 hidden sm:inline">Saralash:</label>
+          <select 
+            id="sortSelect" 
+            class="text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          >
+            <option value="featured">Tavsiya etilgan</option>
+            <option value="price-asc">Narx: Arzondan qimmatga</option>
+            <option value="price-desc">Narx: Qimmatdan arzonga</option>
+            <option value="name-asc">Nomi bo'yicha (A-Z)</option>
+            <option value="rating-desc">Eng yuqori reyting</option>
+            <option value="stock-desc">Ko'p zaxiradagilar</option>
+          </select>
+        </div>
+
+        <!-- Ko'rinish tugmalari -->
+        <div class="flex items-center gap-1 border border-slate-200 rounded-xl p-1 bg-slate-50">
+          <button id="viewGridBtn" class="p-2 rounded-lg bg-blue-600 text-white shadow-xs" title="Kartalar ko'rinishi">
+            <i data-lucide="layout-grid" class="w-4 h-4"></i>
+          </button>
+          <button id="viewTableBtn" class="p-2 rounded-lg bg-white text-slate-500 hover:text-slate-800 border border-slate-200" title="Jadval / Narxlar ro'yxati ko'rinishi">
+            <i data-lucide="list" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mahsulotlar Ro'yxati / Konteyner -->
+    <div id="productsContainer">
+      <!-- JavaScript renderProducts() orqali to'ldiriladi -->
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 mt-12 py-8 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold">Z</div>
+        <span class="font-bold text-slate-800">Zukko Maktab Do'koni</span> — Barcha huquqlar himoyalangan &copy; 2026.
+      </div>
+      <div class="flex items-center gap-6">
+        <span>Telefon: +998 (71) 200-00-00</span>
+        <span>Manzil: 1-sonli umumta'lim maktabi</span>
+        <span>Telegram: @maktab_dokon</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Savatcha Drawer (Slide-out o'ng paneli) -->
+  <div id="cartBackdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 hidden no-print" onclick="toggleCartDrawer(false)"></div>
+  <div id="cartDrawer" class="fixed top-0 right-0 h-full w-full sm:w-[440px] bg-white z-50 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 no-print">
+    
+    <!-- Drawer Header -->
+    <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+          <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <h3 class="font-extrabold text-slate-900 text-base">Savatchangiz</h3>
+          <p class="text-xs text-slate-500">Tanlangan maktab anjomlari</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="clearCart()" class="text-xs font-semibold text-rose-600 hover:text-rose-700 p-1" title="Tozalash">
+          Tozalash
+        </button>
+        <button onclick="toggleCartDrawer(false)" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mahsulotlar ro'yxati -->
+    <div id="cartItemsList" class="flex-1 overflow-y-auto p-4 space-y-3">
+      <!-- Dinamik to'ldiriladi -->
+    </div>
+
+    <!-- Drawer Footer / Hisob-kitob -->
+    <div class="p-4 sm:p-5 border-t border-slate-100 bg-slate-50 flex flex-col gap-3">
+      <div class="flex items-center justify-between text-xs text-slate-500">
+        <span>Oraliq jami:</span>
+        <span id="cartSubtotal" class="font-bold text-slate-800">0 so'm</span>
+      </div>
+      <div class="flex items-center justify-between text-xs text-emerald-600">
+        <span>Chegirmalardan tejaldi:</span>
+        <span id="cartDiscountSavings" class="font-bold">0 so'm</span>
+      </div>
+      <div class="flex items-center justify-between text-base font-black text-slate-900 pt-2 border-t border-slate-200">
+        <span>Jami to'lov:</span>
+        <span id="cartTotal" class="text-blue-700 text-lg">0 so'm</span>
+      </div>
+
+      <button 
+        onclick="openCheckoutModal()"
+        class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-500/25 active:scale-98 transition flex items-center justify-center gap-2"
+      >
+        <span>Buyurtmani rasmiylashtirish</span>
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Mahsulot batafsil modali -->
+  <div id="productDetailModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print">
+    <div class="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-6 overflow-hidden max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('productDetailModal')" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-full transition">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div id="productDetailContent">
+        <!-- JS orqali to'ldiriladi -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Rasmiy Narxnoma Modali (Chop etish rejimi bilan) -->
+  <div id="priceListModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 hidden">
+    <div class="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl p-6 sm:p-8 overflow-hidden max-h-[95vh] overflow-y-auto print-page">
+      
+      <!-- Modal boshqaruvi (faqat ekranda) -->
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-6 no-print">
+        <div>
+          <h3 class="text-lg font-black text-slate-900">Maktab do'koni rasmiy narxnomasi</h3>
+          <p class="text-xs text-slate-500">Chop etish yoki tekshirish uchun qulay jadval</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button 
+            onclick="printPriceList()" 
+            class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition"
+          >
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>Chop etish (A4)</span>
+          </button>
+          <button 
+            onclick="closeModal('priceListModal')" 
+            class="p-2 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-100 transition"
+          >
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Rasmiy Narxnoma Chop etish hujjati -->
+      <div class="space-y-4">
+        <!-- Rasmiy Blank Sarlavhasi -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b-2 border-slate-800 pb-4 gap-2">
+          <div>
+            <h2 class="text-xl font-black text-slate-900 uppercase tracking-tight">"Zukko" Maktab Do'koni</h2>
+            <p class="text-xs font-semibold text-slate-600">Umumta'lim maktabi o'quv qurollari va kantselyariya narxnomasi</p>
+          </div>
+          <div class="text-right text-xs">
+            <div class="font-bold text-slate-800">Sana: <span id="priceListDate" class="font-normal text-slate-600">--</span></div>
+            <div class="text-slate-500 text-[11px]">Valyuta: O'zbekiston so'mi (UZS)</div>
+          </div>
+        </div>
+
+        <!-- Jadval -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border border-slate-200">
+            <thead class="bg-slate-100 text-slate-700 font-extrabold uppercase text-[10px] tracking-wider border-b border-slate-300">
+              <tr>
+                <th class="py-2.5 px-3 text-center w-10">№</th>
+                <th class="py-2.5 px-3 w-24">Artikul</th>
+                <th class="py-2.5 px-3">Mahsulot to'liq nomi</th>
+                <th class="py-2.5 px-3">Bo'lim / Kategoriya</th>
+                <th class="py-2.5 px-3 text-center">Birlik</th>
+                <th class="py-2.5 px-3 text-center">Ombordagi qoldiq</th>
+                <th class="py-2.5 px-3 text-right">Belgilangan narxi</th>
+              </tr>
+            </thead>
+            <tbody id="priceListTableBody" class="divide-y divide-slate-100 font-medium">
+              <!-- JS orqali to'ldiriladi -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Quyi xulosalar -->
+        <div class="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-slate-200 text-xs gap-3">
+          <div class="flex items-center gap-4 text-slate-600">
+            <span>Katalog hajmi: <b id="priceListTotalCount" class="text-slate-900">0</b></span>
+            <span>Umumiy tovar qiymati: <b id="priceListTotalValue" class="text-slate-900">0 so'm</b></span>
+          </div>
+          <div class="text-right text-[11px] text-slate-500">
+            Mas'ul do'kondor: ____________________ (Imzo)
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Yangi Mahsulot Qo'shish Modali -->
+  <div id="addProductModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print">
+    <div class="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl p-6 overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">Yangi mahsulot kiritish</h3>
+          <p class="text-xs text-slate-500">Maktab do'koni katalogiga yangi tovar qo'shish</p>
+        </div>
+        <button onclick="closeModal('addProductModal')" class="p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="addProductForm" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Mahsulot nomi *</label>
+          <input type="text" id="newProdName" required placeholder="Masalan: 36 varaqli biologiya daftari" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Artikul / Kod</label>
+            <input type="text" id="newProdCode" placeholder="Masalan: MB-0105" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Kategoriya *</label>
+            <select id="newProdCategory" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">
+              <option value="daftarlar">Daftarlar</option>
+              <option value="ruchkalar">Ruchka va Qalamlar</option>
+              <option value="sanat">Rasm va San'at</option>
+              <option value="asboblar">Geometriya va Chizmachilik</option>
+              <option value="mayda">Mayda kantselyariya</option>
+              <option value="sumkalar">Ryukzak va Penallar</option>
+              <option value="kitoblar">Kundalik va Muqovalar</option>
+              <option value="tamaddi">Idish va Lanch-boks</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Sotuv narxi (so'm) *</label>
+            <input type="number" id="newProdPrice" required min="100" step="100" placeholder="7000" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Eski narxi (agar chegirma bo'lsa)</label>
+            <input type="number" id="newProdOldPrice" min="100" step="100" placeholder="9000" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Ombordagi soni</label>
+            <input type="number" id="newProdStock" min="0" value="50" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">O'lchov birligi</label>
+            <input type="text" id="newProdUnit" value="dona" placeholder="dona / to'plam" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Belgi (Badge)</label>
+            <input type="text" id="newProdBadge" placeholder="Yangi / Tavsiya" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Rasm havolasi (URL)</label>
+          <input type="url" id="newProdImage" placeholder="https://..." class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Mahsulot tavsifi</label>
+          <textarea id="newProdDescription" rows="2" placeholder="O'quvchilar uchun xususiyatlari..." class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none"></textarea>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeModal('addProductModal')" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold">
+            Bekor qilish
+          </button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md shadow-blue-500/20">
+            Katalogga qo'shish
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Buyurtma / Rasmiylashtirish Modali -->
+  <div id="checkoutModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print">
+    <div class="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl p-6 overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">Buyurtmani tasdiqlash</h3>
+          <p class="text-xs text-slate-500">O'quvchi ma'lumotlarini kiriting va buyurtmani yuboring</p>
+        </div>
+        <button onclick="closeModal('checkoutModal')" class="p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Tanlangan tovarlar sarhisobi -->
+      <div id="checkoutSummary"></div>
+
+      <!-- Xaridor formasi -->
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">O'quvchi / Ota-ona ismi *</label>
+          <input type="text" id="orderCustomerName" required placeholder="Masalan: Sardor Aliyev" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Telefon raqam *</label>
+            <input type="tel" id="orderPhone" required placeholder="+998 90 123 45 67" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Sinf (ixtiyoriy)</label>
+            <input type="text" id="orderGrade" placeholder="Masalan: 7-A sinf" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1.5">Qabul qilish usuli</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50">
+              <input type="radio" name="deliveryMethod" value="pickup" checked class="text-blue-600">
+              <span class="font-medium text-slate-800">Do'kondan olib ketish</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50">
+              <input type="radio" name="deliveryMethod" value="classroom" class="text-blue-600">
+              <span class="font-medium text-slate-800">Sinfga yetkazish</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Qo'shimcha izoh</label>
+          <input type="text" id="orderNotes" placeholder="Masalan: qiz bolalar uchun pushti rangda..." class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 outline-none">
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-2">
+          <button 
+            type="button" 
+            onclick="submitOrder('copy')" 
+            class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition flex items-center justify-center gap-1.5"
+          >
+            <i data-lucide="copy" class="w-4 h-4"></i>
+            <span>Nusxalash</span>
+          </button>
+          
+          <button 
+            type="button" 
+            onclick="submitOrder('telegram')" 
+            class="flex-1 w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold transition shadow-md shadow-sky-500/25 flex items-center justify-center gap-2"
+          >
+            <i data-lucide="send" class="w-4 h-4"></i>
+            <span>Telegram orqali yuborish</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Mobil uchun suzuvchi savatcha tugmasi -->
+  <div class="fixed bottom-5 left-1/2 -translate-x-1/2 z-30 sm:hidden no-print">
+    <button 
+      onclick="toggleCartDrawer(true)"
+      class="flex items-center gap-2.5 px-5 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xl shadow-blue-600/40 active:scale-95 transition"
+    >
+      <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+      <span>Savatcha</span>
+      <span id="cartFloatingCount" class="w-5 h-5 rounded-full bg-white text-blue-700 flex items-center justify-center font-extrabold text-[10px]">0</span>
+    </button>
+  </div>
+
+  <!-- Toast Xabarnomalar Konteyneri -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none no-print"></div>
+
+  <!-- JavaScript fayllari -->
+  <script src="products.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
